@@ -53,32 +53,32 @@ def search(songs) :
 
 	try :
 		for (i,(song,album,singer)) in enumerate(songs.slist) :
-			if process>0 :
-				process -= 1
-				pid = os.fork()
-				if not pid :
-					print '%3d now trying to download %s' % (i,song)
-					linklist = Sougou.select(song,album,singer)+Yahoo.select(song,album,singer)#+Top100.select(song,album,singer)
-					if not linklist : exit(1)
-					linklist.sort()
-					for distinction,downlink in linklist[:3] :
-						exname = downlink.split('.')[-1].rstrip().lower().split('?')[0]
-						filename = song+'.'+exname
-						if Download.begin_download(downlink,filename,5) :
-							print 'Download complete : ',song
-							exit()
-						else :
-							print 'Download crashed : ',song,'\tTry to download from another source'
-					exit(1)
-				else :
-					PS[pid]=(song,album,singer)
-			else :
+			if process <= 0:
 				pid,failed = os.wait()
 				process += 1
 				if failed :
 					print 'Download Failed in',song
 					notfoundlist.append(PS[pid])
 					del PS[pid]
+
+			process -= 1
+			pid = os.fork()
+			if not pid :
+				print '%3d now trying to download %s' % (i,song)
+				linklist = Sougou.select(song,album,singer)+Yahoo.select(song,album,singer)#+Top100.select(song,album,singer)
+				if not linklist : exit(1)
+				linklist.sort()
+				for distinction,downlink in linklist[:3] :
+					exname = downlink.split('.')[-1].rstrip().lower().split('?')[0]
+					filename = song+'.'+exname
+					if Download.begin_download(downlink,filename,5) :
+						print 'Download complete : ',song
+						exit()
+					else :
+						print 'Download crashed : ',song,'\tTry to download from another source'
+				exit(1)
+			else :
+				PS[pid]=(song,album,singer)
 
 
 		for key in PS.keys() :
