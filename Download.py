@@ -37,14 +37,14 @@ class partdown(threading.Thread):
 		self.downloaded = self.begin
 		opener = urllib.FancyURLopener()
 		opener.addheader("Range","bytes=%d-%d" % (self.begin,self.end))
-		self.urlhandle = opener.open(self.url)
+		urlhandle = opener.open(self.url)
 		data = 1
 		while data :
 
 			if die.isdie() : return
 			tig = time.time()
 			lock.acquire()
-			data = self.urlhandle.read(piece)
+			data = urlhandle.read(piece)
 			self.store(data)
 			lock.release()
 			if time.time()-tig >= 5 :
