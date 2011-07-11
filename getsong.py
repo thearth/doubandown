@@ -44,12 +44,12 @@ def search(songs) :
 	notfoundlist = []						#未找到歌曲列表
 	i,j = 0,0
 	PS = {}									#进程pid与歌曲名字的字典
-	current_path = os.getcwd()
-	songlist = filterlist(songs.namelist,songs.slist,current_path) 
-	print len(songlist)
 	path = raw_input('Path to download : ')
 	if not os.path.exists(path) : os.mkdir(path)
 	os.chdir(path)
+	current_path = os.getcwd()
+	songlist = filterlist(songs.namelist,songs.slist,current_path) 
+	print len(songlist)
 
 	try :
 		for (i,(song,album,singer)) in enumerate(songs.slist) :
