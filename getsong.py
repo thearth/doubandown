@@ -52,7 +52,7 @@ def search(songs) :
 	print len(songlist)
 
 	try :
-		for (i,(song,album,singer)) in enumerate(songs.slist) :
+		for (i,(song,album,singer)) in enumerate(songlist) :
 			if process <= 0:
 				pid,failed = os.wait()
 				process += 1
