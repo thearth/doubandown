@@ -43,8 +43,10 @@ class partdown(threading.Thread):
 
 			if die.isdie() : return
 			tig = time.time()
+			lock.acquire()
 			data = self.urlhandle.read(piece)
 			self.store(data)
+			lock.release()
 			if time.time()-tig >= 5 :
 				lockd.acquire()
 				die.godie()
@@ -52,10 +54,8 @@ class partdown(threading.Thread):
 
 
 	def store(self,data):
-		lock.acquire()
 		self.filehandle.seek(self.downloaded)
 		self.filehandle.write(data)
-		lock.release()
 		self.downloaded += piece
 
 
