@@ -3,11 +3,13 @@
 import urllib
 import time
 import threading
+import signal
 import os
 
 piece = 4096
 lock = threading.RLock()
 lockd = threading.RLock()
+
 
 class CanNotDownload(Exception) :
 	def __init(self) :
@@ -22,7 +24,23 @@ class Die():
 	def godie(self) :
 		self.die += 1
 
+class Downfile() :
+	name = ''
+	def setname(self,string) :
+		self.name = string
+	def delete(self) :
+		print 'Trying to remove',self.name
+		if os.path.isfile(self.name) : os.remove(self.name)
+
+downfile = Downfile()
 die = Die()
+
+def func_sig(a,b):
+	downfile.delete()
+	os.abort()
+
+signal.signal(signal.SIGUSR1,func_sig)
+
 
 class partdown(threading.Thread):
 	def __init__(self,url,span,filehandle) :
@@ -82,6 +100,7 @@ def splitblocks(totalsize,blockcount) :
 
 def begin_download(url,filename,threadcount) :
 
+	downfile.setname(filename)
 	try :
 		filelength = getfilesize(url)
 		filehandle = open(filename,'wb')
@@ -93,9 +112,10 @@ def begin_download(url,filename,threadcount) :
 			tasks[-1].start()
 		for task in tasks :
 			task.join()
-		if die.isdie() : return False
+		if die.isdie() : raise CanNotDownload()
 		return True
 	except :
+		print 'Try to delete',filename
 		if os.path.isfile(filename) : os.remove(filename)
 		return False
 
