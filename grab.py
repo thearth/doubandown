@@ -34,7 +34,7 @@ class robot:
 		while True :
 
 			response = urllib2.Request(self.login_path,urllib.urlencode(self.form))		# request a url with post data
-			print urllib.urlencode(self.form)
+#			print urllib.urlencode(self.form)
 			url = self.opener.open(response).geturl()
 			print url
 			if url.find('douban.fm')>=0 :												#分析返回的url看是否已经登录成功
