@@ -23,16 +23,15 @@ def filterlist(songs,songlist,current_path) :
 	songs.sort()
 	songlist.sort()
 	i,j = 0,0
-	for filelist in os.walk(current_path) : filelist = filelist[2]
+	filelist = os.listdir(current_path)
 	filelist.sort()
 	result = []
 	lens,lenf = len(songs),len(filelist)
 	while i<lens and j<lenf :
-		song = songs[i]
-		flag = cmp(song,os.path.splitext(filelist[j])[0])
-		if flag>0 : j += 1
+		flag = cmp(songs[i],os.path.splitext(filelist[j])[0])
+		if flag>0 : 
+			j += 1
 		elif flag==0 : 
-#			print songlist[i][0]+'\t'+songlist[i][1]+'\t'+songlist[i][2],'already exists'
 			i,j = i+1,j+1
 		else :
 			result.append(songlist[i])
@@ -48,12 +47,14 @@ def search(songs) :
 	i,j = 0,0
 	PS = {}									#进程pid与歌曲名字的字典
 	path = raw_input('Path to download : ')
-	if not os.path.exists(path) : os.mkdir(path)
-	os.chdir(path)
+	if path :
+		if not os.path.exists(path) : os.mkdir(path)
+		os.chdir(path)
 
 	current_path = os.getcwd()
+	print 'Now download songs to :',current_path
 	songlist = filterlist(songs.namelist,songs.slist,current_path) 
-	print len(songlist)
+	print 'There are %d in list and %d need to download' % (len(songs.slist),len(songlist))
 #	for (i,(song,album,singer)) in enumerate(songlist) :
 #		print song+'\t'+album+'\t'+singer
 
@@ -65,7 +66,7 @@ def search(songs) :
 				if failed :
 					print 'Download Failed in',song
 					notfoundlist.append(PS[pid])
-					del PS[pid]
+				del PS[pid]
 
 			process -= 1
 			pid = os.fork()
@@ -98,6 +99,7 @@ def search(songs) :
 	except KeyboardInterrupt :
 		for key in PS.keys() :
 			print key
+		for key in PS.keys() :
 			os.kill(key,9)
 	
 	
